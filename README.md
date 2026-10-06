@@ -56,6 +56,20 @@ The database includes pre-seeded demo accounts for testing role-based access:
 
 ---
 
+### 💳 Demo Payment Details
+
+The payment checkout modal includes one-click auto-fill buttons and simulated credentials for all methods:
+
+| Payment Method | Demo Credentials / Identifier | Gateway Simulation |
+| :--- | :--- | :--- |
+| **UPI** | `evdriver@okhdfcbank` or `chargeflow@upi` | Instant simulated settlement |
+| **Credit Card** | Card: `4532 8901 2345 6789`, Expiry: `12/28`, CVV: `888` | Demo Visa |
+| **Debit Card** | Card: `5412 7500 1234 5678`, Expiry: `08/29`, CVV: `123` | Demo Mastercard |
+| **Net Banking** | `HDFC Bank (Demo)` / `ICICI Bank (Demo)` | Simulated retail net banking |
+| **Cash** | Kiosk receipt | On-site counter collection |
+
+---
+
 ## 📁 Exact Project Structure
 
 ```

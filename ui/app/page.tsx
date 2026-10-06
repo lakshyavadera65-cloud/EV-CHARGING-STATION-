@@ -195,6 +195,11 @@ export default function Page() {
   const [paymentForm, setPaymentForm] = useState({
     Payment_Method: 'UPI',
     Amount: '',
+    Upi_Id: 'evdriver@okhdfcbank',
+    Card_Number: '4532 8901 2345 6789',
+    Card_Expiry: '12/28',
+    Card_Cvv: '888',
+    Bank_Name: 'HDFC Bank (Demo)',
   })
 
   const [maintenanceModalOpen, setMaintenanceModalOpen] = useState(false)
@@ -1423,6 +1428,11 @@ export default function Page() {
                                       setPaymentForm({
                                         Payment_Method: 'UPI',
                                         Amount: String(session.Charging_Cost || ''),
+                                        Upi_Id: 'evdriver@okhdfcbank',
+                                        Card_Number: '4532 8901 2345 6789',
+                                        Card_Expiry: '12/28',
+                                        Card_Cvv: '888',
+                                        Bank_Name: 'HDFC Bank (Demo)',
                                       })
                                       setPaymentModalOpen(true)
                                     }}
@@ -1879,6 +1889,11 @@ export default function Page() {
                                     setPaymentForm({
                                       Payment_Method: 'UPI',
                                       Amount: String(session.Charging_Cost || ''),
+                                      Upi_Id: 'evdriver@okhdfcbank',
+                                      Card_Number: '4532 8901 2345 6789',
+                                      Card_Expiry: '12/28',
+                                      Card_Cvv: '888',
+                                      Bank_Name: 'HDFC Bank (Demo)',
                                     })
                                     setPaymentModalOpen(true)
                                   }}
@@ -3134,13 +3149,159 @@ export default function Page() {
                     value={paymentForm.Payment_Method}
                     onChange={(e) => setPaymentForm({ ...paymentForm, Payment_Method: e.target.value })}
                   >
-                    <option value="UPI">UPI (Google Pay / PhonePe / Paytm)</option>
-                    <option value="Credit Card">Credit Card</option>
+                    <option value="UPI">UPI (Google Pay / PhonePe / Paytm / BHIM)</option>
+                    <option value="Credit Card">Credit Card (Visa / Mastercard / RuPay)</option>
                     <option value="Debit Card">Debit Card</option>
                     <option value="Net Banking">Net Banking</option>
-                    <option value="Cash">Cash</option>
+                    <option value="Cash">Cash (At Counter)</option>
                   </select>
                 </div>
+
+                {/* Quick-fill Demo Payment Options */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <span className="muted small" style={{ fontWeight: 700, fontSize: 10 }}>
+                    DEMO PAYMENT DETAILS (CLICK TO AUTO-FILL):
+                  </span>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    <button
+                      type="button"
+                      className="btn-outline btn-sm"
+                      onClick={() =>
+                        setPaymentForm({
+                          ...paymentForm,
+                          Payment_Method: 'UPI',
+                          Upi_Id: 'evdriver@okhdfcbank',
+                        })
+                      }
+                    >
+                      ⚡ Demo UPI (evdriver@okhdfcbank)
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline btn-sm"
+                      onClick={() =>
+                        setPaymentForm({
+                          ...paymentForm,
+                          Payment_Method: 'Credit Card',
+                          Card_Number: '4532 8901 2345 6789',
+                          Card_Expiry: '12/28',
+                          Card_Cvv: '888',
+                        })
+                      }
+                    >
+                      ⚡ Demo Visa (4532 •••• 6789)
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline btn-sm"
+                      onClick={() =>
+                        setPaymentForm({
+                          ...paymentForm,
+                          Payment_Method: 'Debit Card',
+                          Card_Number: '5412 7500 1234 5678',
+                          Card_Expiry: '08/29',
+                          Card_Cvv: '123',
+                        })
+                      }
+                    >
+                      ⚡ Demo Mastercard (5412 •••• 5678)
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-outline btn-sm"
+                      onClick={() =>
+                        setPaymentForm({
+                          ...paymentForm,
+                          Payment_Method: 'Net Banking',
+                          Bank_Name: 'HDFC Bank (Demo)',
+                        })
+                      }
+                    >
+                      ⚡ Demo Net Banking (HDFC)
+                    </button>
+                  </div>
+                </div>
+
+                {/* Method-Specific Inputs */}
+                {paymentForm.Payment_Method === 'UPI' && (
+                  <div className="form-group">
+                    <label className="form-label">Virtual Payment Address (VPA / UPI ID)</label>
+                    <input
+                      className="form-input"
+                      value={paymentForm.Upi_Id}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, Upi_Id: e.target.value })}
+                      placeholder="e.g. evdriver@okhdfcbank"
+                    />
+                    <span className="form-help">Supported handles: @okhdfcbank, @okaxis, @ybl, @paytm</span>
+                  </div>
+                )}
+
+                {(paymentForm.Payment_Method === 'Credit Card' || paymentForm.Payment_Method === 'Debit Card') && (
+                  <>
+                    <div className="form-group">
+                      <label className="form-label">Card Number</label>
+                      <input
+                        className="form-input"
+                        value={paymentForm.Card_Number}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, Card_Number: e.target.value })}
+                        placeholder="4532 8901 2345 6789"
+                      />
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label className="form-label">Valid Thru (MM/YY)</label>
+                        <input
+                          className="form-input"
+                          value={paymentForm.Card_Expiry}
+                          onChange={(e) => setPaymentForm({ ...paymentForm, Card_Expiry: e.target.value })}
+                          placeholder="12/28"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">CVV</label>
+                        <input
+                          className="form-input"
+                          type="password"
+                          maxLength={4}
+                          value={paymentForm.Card_Cvv}
+                          onChange={(e) => setPaymentForm({ ...paymentForm, Card_Cvv: e.target.value })}
+                          placeholder="888"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {paymentForm.Payment_Method === 'Net Banking' && (
+                  <div className="form-group">
+                    <label className="form-label">Select Bank</label>
+                    <select
+                      className="form-select"
+                      value={paymentForm.Bank_Name}
+                      onChange={(e) => setPaymentForm({ ...paymentForm, Bank_Name: e.target.value })}
+                    >
+                      <option value="HDFC Bank (Demo)">HDFC Bank (Demo)</option>
+                      <option value="ICICI Bank (Demo)">ICICI Bank (Demo)</option>
+                      <option value="State Bank of India (Demo)">State Bank of India (Demo)</option>
+                      <option value="Axis Bank (Demo)">Axis Bank (Demo)</option>
+                      <option value="Kotak Mahindra Bank (Demo)">Kotak Mahindra Bank (Demo)</option>
+                    </select>
+                  </div>
+                )}
+
+                {paymentForm.Payment_Method === 'Cash' && (
+                  <div
+                    style={{
+                      background: 'var(--surface-2)',
+                      padding: 10,
+                      borderRadius: 7,
+                      fontSize: 11,
+                      color: 'var(--muted)',
+                    }}
+                  >
+                    💵 Cash payment will be collected by on-site station staff.
+                  </div>
+                )}
 
                 <div className="form-group">
                   <label className="form-label">Amount (₹) *</label>
@@ -3152,6 +3313,25 @@ export default function Page() {
                     value={paymentForm.Amount}
                     onChange={(e) => setPaymentForm({ ...paymentForm, Amount: e.target.value })}
                   />
+                </div>
+
+                <div
+                  style={{
+                    background: '#19c37d15',
+                    border: '1px solid #19c37d40',
+                    borderRadius: 8,
+                    padding: '8px 11px',
+                    fontSize: 11,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 7,
+                    color: 'var(--green-dark)',
+                  }}
+                >
+                  <ShieldCheck size={14} />
+                  <span>
+                    Sandbox Demo Gateway: Creates a real payment record in MySQL with Status = <strong>Paid</strong>.
+                  </span>
                 </div>
               </div>
               <div className="modal-footer">
