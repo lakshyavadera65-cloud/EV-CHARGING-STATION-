@@ -886,6 +886,138 @@ export default function Page() {
     }
   }
 
+  // --- Demo Payment Trigger for Customer & Owner ---
+  const handleTriggerDemoPayment = async (asRole?: 'CUSTOMER' | 'OWNER') => {
+    setLoading(true)
+    try {
+      let unpaid = sessions.find((s) => s.Session_End !== null && s.Payment_Status !== 'Paid')
+
+      if (!unpaid) {
+        const charger = chargers.find((c) => c.Availability_Status === 'Available') || chargers[0]
+        if (!charger) {
+          addToast('No chargers available to generate session', 'error')
+          return
+        }
+
+        const customer =
+          asRole === 'CUSTOMER' && currentUser?.role === 'CUSTOMER'
+            ? customers.find((c) => c.Customer_ID === currentUser.customer_id) || customers[0]
+            : customers[0]
+
+        if (!customer) {
+          addToast('No customer found to generate demo payment', 'error')
+          return
+        }
+
+        const today = new Date().toISOString().split('T')[0]
+        const randHour = Math.floor(Math.random() * 6) + 14
+        const randMin = Math.floor(Math.random() * 30)
+        const startTime = `${String(randHour).padStart(2, '0')}:${String(randMin).padStart(2, '0')}`
+        const endTime = `${String(randHour).padStart(2, '0')}:${String(randMin + 20).padStart(2, '0')}`
+
+        const bookingRes = await api.bookings.create({
+          Customer_ID: customer.Customer_ID,
+          Charger_ID: charger.Charger_ID,
+          Booking_Date: today,
+          Start_Time: startTime,
+          End_Time: endTime,
+          Booking_Status: 'Confirmed',
+        })
+
+        const newBookingId = bookingRes?.data?.Booking_ID || bookingRes?.Booking_ID
+        const startRes = await api.sessions.start({ Booking_ID: newBookingId })
+        const newSessionId = startRes?.data?.Session_ID || startRes?.Session_ID
+
+        const endRes = await api.sessions.end(newSessionId, { Energy_Consumed: 18.5 })
+        const endedData = endRes?.data || endRes
+
+        unpaid = {
+          Session_ID: newSessionId,
+          Customer_Name: customer.Customer_Name,
+          Charging_Cost: endedData?.Charging_Cost ?? 222.0,
+          Energy_Consumed: 18.5,
+          Payment_Status: 'Pending',
+        }
+        addNotification('Demo Session Ready', `Generated 18.5 kWh session for ${customer.Customer_Name} (₹ ${unpaid.Charging_Cost})`)
+      }
+
+      setSelectedSessionToPay(unpaid)
+      setPaymentForm({
+        Payment_Method: asRole === 'OWNER' ? 'Cash' : 'UPI',
+        Amount: String(unpaid.Charging_Cost || '222.00'),
+        Upi_Id: asRole === 'CUSTOMER' ? 'rahul@okhdfcbank' : 'chargeflow@icici',
+        Card_Number: '4532 8901 2345 6789',
+        Card_Expiry: '12/28',
+        Card_Cvv: '888',
+        Bank_Name: 'HDFC Bank (Demo)',
+      })
+      setPaymentModalOpen(true)
+      addToast(`Demo Checkout opened for Session #${unpaid.Session_ID} (${unpaid.Customer_Name})`, 'info')
+    } catch (err: any) {
+      addToast(err.message || 'Error generating demo payment', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleTriggerDemoPaymentForCustomer = async (customer: any) => {
+    setLoading(true)
+    try {
+      const charger = chargers.find((c) => c.Availability_Status === 'Available') || chargers[0]
+      if (!charger) {
+        addToast('No chargers available', 'error')
+        return
+      }
+
+      const today = new Date().toISOString().split('T')[0]
+      const randHour = Math.floor(Math.random() * 6) + 14
+      const randMin = Math.floor(Math.random() * 30)
+      const startTime = `${String(randHour).padStart(2, '0')}:${String(randMin).padStart(2, '0')}`
+      const endTime = `${String(randHour).padStart(2, '0')}:${String(randMin + 25).padStart(2, '0')}`
+
+      const bookingRes = await api.bookings.create({
+        Customer_ID: customer.Customer_ID,
+        Charger_ID: charger.Charger_ID,
+        Booking_Date: today,
+        Start_Time: startTime,
+        End_Time: endTime,
+        Booking_Status: 'Confirmed',
+      })
+
+      const newBookingId = bookingRes?.data?.Booking_ID || bookingRes?.Booking_ID
+      const startRes = await api.sessions.start({ Booking_ID: newBookingId })
+      const newSessionId = startRes?.data?.Session_ID || startRes?.Session_ID
+
+      const endRes = await api.sessions.end(newSessionId, { Energy_Consumed: 22.0 })
+      const endedData = endRes?.data || endRes
+
+      const sessionToPay = {
+        Session_ID: newSessionId,
+        Customer_Name: customer.Customer_Name,
+        Charging_Cost: endedData?.Charging_Cost ?? 264.0,
+        Energy_Consumed: 22.0,
+        Payment_Status: 'Pending',
+      }
+
+      setSelectedSessionToPay(sessionToPay)
+      setPaymentForm({
+        Payment_Method: 'UPI',
+        Amount: String(sessionToPay.Charging_Cost || '264.00'),
+        Upi_Id: `${customer.Customer_Name.toLowerCase().replace(/[^a-z0-9]/g, '')}@okhdfcbank`,
+        Card_Number: '4532 8901 2345 6789',
+        Card_Expiry: '12/28',
+        Card_Cvv: '888',
+        Bank_Name: 'HDFC Bank (Demo)',
+      })
+      setPaymentModalOpen(true)
+      addToast(`Demo Payment checkout created for ${customer.Customer_Name}`, 'success')
+    } catch (err: any) {
+      addToast(err.message || 'Error generating demo payment', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // --- Maintenance Flow ---
   const handleSaveMaintenance = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -1923,7 +2055,7 @@ export default function Page() {
               <div className="view-header" style={{ padding: '18px 20px 0' }}>
                 <div>
                   <h2>Payments & Invoicing ({filteredPayments.length})</h2>
-                  <p className="muted small">Settlements and collections history</p>
+                  <p className="muted small">Settlements and collections history with simulated demo checkout</p>
                 </div>
                 <div className="view-actions">
                   <div className="filter-tabs">
@@ -1936,6 +2068,52 @@ export default function Page() {
                         {st}
                       </button>
                     ))}
+                  </div>
+                  <button
+                    className="btn-primary"
+                    onClick={() => handleTriggerDemoPayment()}
+                    title="Simulate a quick demo charging session payment"
+                  >
+                    <CreditCard size={15} /> ⚡ Make Demo Payment
+                  </button>
+                </div>
+              </div>
+
+              {/* Demo Payment Profiles for Customer & Owner */}
+              <div style={{ padding: '0 20px 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
+                {/* Customer Demo Box */}
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span className="badge badge-confirmed">CUSTOMER DEMO</span>
+                      <strong>Rahul Sharma</strong>
+                    </div>
+                    <button className="btn-outline btn-sm" onClick={() => handleTriggerDemoPayment('CUSTOMER')}>
+                      ⚡ Pay as Customer
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div>📱 <strong>UPI ID:</strong> <code style={{ color: 'var(--green)', fontWeight: 700 }}>rahul@okhdfcbank</code></div>
+                    <div>💳 <strong>Demo Card:</strong> Visa •••• 8910 (12/28 · CVV 888)</div>
+                    <div>💰 <strong>Demo EV Wallet:</strong> ₹ 5,000.00 Credits Available</div>
+                  </div>
+                </div>
+
+                {/* Owner Demo Box */}
+                <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span className="badge badge-available">OWNER DEMO</span>
+                      <strong>Rajesh Sharma (Owner)</strong>
+                    </div>
+                    <button className="btn-primary btn-sm" onClick={() => handleTriggerDemoPayment('OWNER')}>
+                      ⚡ Collect as Owner
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div>🏦 <strong>Merchant UPI:</strong> <code style={{ color: 'var(--green)', fontWeight: 700 }}>chargeflow.merchant@icici</code></div>
+                    <div>🏧 <strong>POS Settlement:</strong> HDFC Current A/C •••• 4492 (T+0)</div>
+                    <div>⚡ <strong>Accepted:</strong> Dynamic UPI QR, Visa / Mastercard, POS Cash</div>
                   </div>
                 </div>
               </div>
@@ -2040,6 +2218,13 @@ export default function Page() {
                         <td>{c.Address || '—'}</td>
                         <td>
                           <div className="btn-action-group">
+                            <button
+                              className="btn-primary btn-sm"
+                              title={`Create demo session & process payment for ${c.Customer_Name}`}
+                              onClick={() => handleTriggerDemoPaymentForCustomer(c)}
+                            >
+                              <CreditCard size={11} /> Demo Pay
+                            </button>
                             <button
                               className="btn-outline btn-sm"
                               onClick={() => {
@@ -2327,7 +2512,7 @@ export default function Page() {
               {authTab === 'demo' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <p className="muted small">
-                    Quickly toggle between seeded demo accounts to test role-based permissions:
+                    Quickly toggle between seeded demo accounts with pre-configured payment profiles:
                   </p>
                   <div
                     style={{
@@ -2336,18 +2521,25 @@ export default function Page() {
                       borderRadius: 9,
                       border: '1px solid var(--border)',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
+                      gap: 8,
                     }}
                   >
-                    <div>
-                      <strong>Demo Station Owner</strong>
-                      <div className="muted small">owner@demo.com · Role: OWNER</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <strong>Demo Station Owner</strong>
+                        <div className="muted small">owner@demo.com · Password: <code>Owner@123</code></div>
+                      </div>
+                      <button className="btn-primary btn-sm" onClick={() => handleDemoSwitch('OWNER')}>
+                        Activate Owner Mode
+                      </button>
                     </div>
-                    <button className="btn-primary btn-sm" onClick={() => handleDemoSwitch('OWNER')}>
-                      Activate Owner
-                    </button>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', background: 'var(--surface)', padding: '8px 10px', borderRadius: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <div>🏦 <strong>Owner Merchant Gateway:</strong> <code>chargeflow.merchant@icici</code></div>
+                      <div>🏧 <strong>POS Settlement Account:</strong> HDFC Current A/C •••• 4492 (Auto T+0)</div>
+                    </div>
                   </div>
+
                   <div
                     style={{
                       background: 'var(--surface-2)',
@@ -2355,17 +2547,24 @@ export default function Page() {
                       borderRadius: 9,
                       border: '1px solid var(--border)',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
+                      flexDirection: 'column',
+                      gap: 8,
                     }}
                   >
-                    <div>
-                      <strong>Demo Customer</strong>
-                      <div className="muted small">rahul@gmail.com · Role: CUSTOMER</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div>
+                        <strong>Demo Customer</strong>
+                        <div className="muted small">rahul@gmail.com · Password: <code>Customer@123</code></div>
+                      </div>
+                      <button className="btn-secondary btn-sm" onClick={() => handleDemoSwitch('CUSTOMER')}>
+                        Activate Customer Mode
+                      </button>
                     </div>
-                    <button className="btn-secondary btn-sm" onClick={() => handleDemoSwitch('CUSTOMER')}>
-                      Activate Customer
-                    </button>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', background: 'var(--surface)', padding: '8px 10px', borderRadius: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <div>📱 <strong>Customer Demo UPI:</strong> <code>rahul@okhdfcbank</code></div>
+                      <div>💳 <strong>Customer Saved Card:</strong> Visa •••• 8910 (12/28 · CVV 888)</div>
+                      <div>💰 <strong>Demo EV Credits:</strong> ₹ 5,000.00 Wallet Balance</div>
+                    </div>
                   </div>
                 </div>
               )}
