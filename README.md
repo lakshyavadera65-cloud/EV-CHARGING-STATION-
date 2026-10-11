@@ -6,39 +6,39 @@ A robust, enterprise-grade RESTful API backend built with **Node.js**, **Express
 
 ## 📋 Features & Business Rules
 
-1. **Role-Based Authentication & Account System**:
+1. **Role-Based Authentication & Account System** :-
    - Two distinct roles: `CUSTOMER` and `OWNER` (charging station owner).
    - Secure password hashing with `bcryptjs` and token-based authentication via `jsonwebtoken` (JWT, 7-day expiry).
    - Rate limiting on authentication endpoints to prevent brute-force attacks (`express-rate-limit`).
    - Strict validation: email formatting, 8+ character password, role assigned exclusively by registration endpoint.
-2. **Stations & Infrastructure Management**:
+2. **Stations & Infrastructure Management** :-
    - Full CRUD endpoints for charging stations, charging points (chargers), customers, and employees.
    - Charging stations have an `Owner_User_ID` linking each station to an owner.
    - Owners can only modify/delete their own stations and chargers.
-3. **Smart Booking System**:
+3. **Smart Booking System** :-
    - Validation ensuring `End_Time > Start_Time`.
    - Automatic check that the charger exists and is not currently under maintenance.
    - Overlap prevention: Rejects bookings conflicting with existing non-cancelled bookings on the same charger and date.
    - Customers can create and cancel bookings **only for themselves**.
    - Owners can view bookings for their stations.
-4. **Session Lifecycle & Metering**:
+4. **Session Lifecycle & Metering** :-
    - `POST /api/sessions/start`: Starts a session from a `Confirmed` booking and sets the charger to `Occupied` within an atomic MySQL transaction.
    - `POST /api/sessions/:id/end`: Ends a session with recorded `Energy_Consumed` (kWh), calculates total cost as `Energy_Consumed * RATE_PER_KWH`, completes the booking, and marks the charger as `Available` using a MySQL transaction.
    - Customers can start and end sessions only for their own bookings.
-5. **Payment Processing**:
+5. **Payment Processing** :-
    - `POST /api/payments`: Records payment for a finished session using its `Charging_Cost`.
    - Strict one-payment-per-session enforcement (`Session_ID` UNIQUE constraint).
    - Customers can only pay for their own sessions.
-6. **Maintenance Lifecycle**:
+6. **Maintenance Lifecycle** :-
    - `POST /api/maintenance`: Creating an `"In Progress"` maintenance record automatically transitions the charger status to `Maintenance`.
    - `PATCH /api/maintenance/:id/complete`: Completing the maintenance sets the charger status back to `Available`.
    - Restricted to `OWNER` role for chargers at stations they own.
-7. **Analytics & Reports (OWNER only)**:
+7. **Analytics & Reports (OWNER only)** :-
    - **Revenue per station**: Aggregates sessions, energy dispensed, and revenue limited to owner's stations.
    - **Customer-wise energy usage**: Aggregates total sessions, kWh consumed, and expenditure for owner's stations.
    - **Maintenance cost per station**: Aggregates maintenance events, active repairs, and expenses.
    - **Platform summary totals**: Overview of stations, chargers by availability, active vs completed sessions, revenue, and net operating profit for owner's stations.
-8. **Security & Reliability**:
+8. **Security & Reliability** :-
    - 100% parameterized queries to eliminate SQL injection vulnerabilities.
    - Central error handler mapping MySQL error codes (foreign key violations, duplicate keys, data truncation) to standard HTTP 400 / 401 / 403 / 404 / 409 responses.
    - Database connection pooling with health monitoring at `/api/health`.
