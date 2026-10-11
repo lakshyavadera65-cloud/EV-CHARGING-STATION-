@@ -133,7 +133,7 @@ CREATE TABLE `charging_station` (
 
 LOCK TABLES `charging_station` WRITE;
 /*!40000 ALTER TABLE `charging_station` DISABLE KEYS */;
-INSERT INTO `charging_station` VALUES (1,'EV Hub Jaipur','Malviya Nagar, Jaipur','9876543210',10,'24 Hours','Active'),(2,'Green Charge Station','Vaishali Nagar, Jaipur','9876543211',8,'6 AM - 11 PM','Active'),(3,'Power EV Point','Mansarovar, Jaipur','9876543212',12,'24 Hours','Active'),(4,'ChargeGo Jaipur','Tonk Road, Jaipur','9876543213',6,'7 AM - 10 PM','Active');
+INSERT INTO `charging_station` VALUES (1,'PinkCity Volt Hub','Malviya Nagar, Jaipur','9876543210',10,'24 Hours','Active'),(2,'Green Charge Station','Vaishali Nagar, Jaipur','9876543211',8,'6 AM - 11 PM','Active'),(3,'Power EV Point','Mansarovar, Jaipur','9876543212',12,'24 Hours','Active'),(4,'ChargeGo Jaipur','Tonk Road, Jaipur','9876543213',6,'7 AM - 10 PM','Active');
 /*!40000 ALTER TABLE `charging_station` ENABLE KEYS */;
 UNLOCK TABLES;
 

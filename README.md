@@ -1,6 +1,6 @@
-# ⚡ EV Charging Station Management System - REST API Backend
+# ⚡ PinkCity Volt - EV Charging Station Management System - REST API Backend
 
-A robust, enterprise-grade RESTful API backend built with **Node.js**, **Express**, and **mysql2/promise** for managing an Electric Vehicle (EV) Charging Station network, featuring JWT authentication and role-based access control (`CUSTOMER` and `OWNER`).
+A robust, enterprise-grade RESTful API backend built with **Node.js**, **Express**, and **mysql2/promise** for managing the PinkCity Volt Electric Vehicle (EV) Charging Station network, featuring JWT authentication and role-based access control (`CUSTOMER` and `OWNER`).
 
 ---
 
@@ -62,7 +62,7 @@ The payment checkout modal includes one-click auto-fill buttons and simulated cr
 
 | Payment Method | Demo Credentials / Identifier | Gateway Simulation |
 | :--- | :--- | :--- |
-| **UPI** | `evdriver@okhdfcbank` or `chargeflow@upi` | Instant simulated settlement |
+| **UPI** | `evdriver@okhdfcbank` or `pinkcityvolt@upi` | Instant simulated settlement |
 | **Credit Card** | Card: `4532 8901 2345 6789`, Expiry: `12/28`, CVV: `888` | Demo Visa |
 | **Debit Card** | Card: `5412 7500 1234 5678`, Expiry: `08/29`, CVV: `123` | Demo Mastercard |
 | **Net Banking** | `HDFC Bank (Demo)` / `ICICI Bank (Demo)` | Simulated retail net banking |

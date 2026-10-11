@@ -456,7 +456,7 @@ export default function Page() {
   // CSV Export Function
   const handleExportCSV = () => {
     let rows: any[] = []
-    let filename = `chargeflow_${active.toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`
+    let filename = `pinkcityvolt_${active.toLowerCase()}_${new Date().toISOString().split('T')[0]}.csv`
 
     if (active === 'Stations') rows = filteredStations
     else if (active === 'Chargers') rows = filteredChargers
@@ -469,7 +469,7 @@ export default function Page() {
     else {
       // Overview export: revenue by station
       rows = revenueByStation.length > 0 ? revenueByStation : filteredSessions
-      filename = `chargeflow_overview_summary_${new Date().toISOString().split('T')[0]}.csv`
+      filename = `pinkcityvolt_overview_summary_${new Date().toISOString().split('T')[0]}.csv`
     }
 
     if (!rows || rows.length === 0) {
@@ -945,7 +945,7 @@ export default function Page() {
       setPaymentForm({
         Payment_Method: asRole === 'OWNER' ? 'Cash' : 'UPI',
         Amount: String(unpaid.Charging_Cost || '222.00'),
-        Upi_Id: asRole === 'CUSTOMER' ? 'rahul@okhdfcbank' : 'chargeflow@icici',
+        Upi_Id: asRole === 'CUSTOMER' ? 'rahul@okhdfcbank' : 'pinkcityvolt@icici',
         Card_Number: '4532 8901 2345 6789',
         Card_Expiry: '12/28',
         Card_Cvv: '888',
@@ -1077,7 +1077,7 @@ export default function Page() {
   }
 
   if (!mounted) {
-    return <div className="app" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>Loading ChargeFlow...</div>
+    return <div className="app" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center' }}>Loading PinkCity Volt...</div>
   }
 
   return (
@@ -1110,7 +1110,7 @@ export default function Page() {
           </div>
           <div>
             <strong>
-              Charge<span>Flow</span>
+              PinkCity <span>Volt</span>
             </strong>
             <small>REAL MYSQL OPERATIONS</small>
           </div>
@@ -1162,10 +1162,10 @@ export default function Page() {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
           >
             <div className="avatar">
-              {currentUser?.name ? currentUser.name.slice(0, 2).toUpperCase() : 'CF'}
+              {currentUser?.name ? currentUser.name.slice(0, 2).toUpperCase() : 'PV'}
             </div>
             <div>
-              <strong>{currentUser?.name || 'ChargeFlow User'}</strong>
+              <strong>{currentUser?.name || 'PinkCity Volt User'}</strong>
               <small>{currentUser?.role || 'Guest'} · {currentUser?.email?.split('@')[0] || 'demo'}</small>
             </div>
             <ChevronDown size={15} />
@@ -2111,7 +2111,7 @@ export default function Page() {
                     </button>
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--muted)', display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div>🏦 <strong>Merchant UPI:</strong> <code style={{ color: 'var(--green)', fontWeight: 700 }}>chargeflow.merchant@icici</code></div>
+                    <div>🏦 <strong>Merchant UPI:</strong> <code style={{ color: 'var(--green)', fontWeight: 700 }}>pinkcityvolt.merchant@icici</code></div>
                     <div>🏧 <strong>POS Settlement:</strong> HDFC Current A/C •••• 4492 (T+0)</div>
                     <div>⚡ <strong>Accepted:</strong> Dynamic UPI QR, Visa / Mastercard, POS Cash</div>
                   </div>
@@ -2458,7 +2458,7 @@ export default function Page() {
 
           {/* Page Footer */}
           <footer>
-            <span>ChargeFlow EV Hub Management · MySQL 8 Production Sync</span>
+            <span>PinkCity Volt EV Hub Management · MySQL 8 Production Sync</span>
             <span>
               <ShieldCheck size={13} />
               Connected to ev_charging_db · Rate: ₹12.00/kWh
@@ -2535,7 +2535,7 @@ export default function Page() {
                       </button>
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--muted)', background: 'var(--surface)', padding: '8px 10px', borderRadius: 6, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <div>🏦 <strong>Owner Merchant Gateway:</strong> <code>chargeflow.merchant@icici</code></div>
+                      <div>🏦 <strong>Owner Merchant Gateway:</strong> <code>pinkcityvolt.merchant@icici</code></div>
                       <div>🏧 <strong>POS Settlement Account:</strong> HDFC Current A/C •••• 4492 (Auto T+0)</div>
                     </div>
                   </div>
@@ -3036,7 +3036,7 @@ export default function Page() {
                     type="email"
                     value={employeeForm.Email}
                     onChange={(e) => setEmployeeForm({ ...employeeForm, Email: e.target.value })}
-                    placeholder="rajesh@chargeflow.in"
+                    placeholder="rajesh@pinkcityvolt.in"
                   />
                 </div>
               </div>

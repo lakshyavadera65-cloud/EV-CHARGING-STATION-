@@ -22,21 +22,22 @@ export interface ApiResponse<T> {
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('chargeflow_token')
+  return localStorage.getItem('pinkcityvolt_token') || localStorage.getItem('chargeflow_token')
 }
 
 export function setToken(token: string | null) {
   if (typeof window === 'undefined') return
   if (token) {
-    localStorage.setItem('chargeflow_token', token)
+    localStorage.setItem('pinkcityvolt_token', token)
   } else {
+    localStorage.removeItem('pinkcityvolt_token')
     localStorage.removeItem('chargeflow_token')
   }
 }
 
 export function getStoredUser(): UserAccount | null {
   if (typeof window === 'undefined') return null
-  const raw = localStorage.getItem('chargeflow_user')
+  const raw = localStorage.getItem('pinkcityvolt_user') || localStorage.getItem('chargeflow_user')
   if (!raw) return null
   try {
     return JSON.parse(raw)
@@ -48,8 +49,9 @@ export function getStoredUser(): UserAccount | null {
 export function setStoredUser(user: UserAccount | null) {
   if (typeof window === 'undefined') return
   if (user) {
-    localStorage.setItem('chargeflow_user', JSON.stringify(user))
+    localStorage.setItem('pinkcityvolt_user', JSON.stringify(user))
   } else {
+    localStorage.removeItem('pinkcityvolt_user')
     localStorage.removeItem('chargeflow_user')
   }
 }

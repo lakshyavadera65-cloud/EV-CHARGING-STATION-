@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ChargeFlow | EV Network Operations',
-  description: 'Real-time EV charging station management for Jaipur operations.',
+  title: 'PinkCity Volt | EV Network Operations',
+  description: 'Real-time EV charging station management for PinkCity Volt operations in Jaipur.',
   generator: 'v0.app',
   icons: {
     icon: [

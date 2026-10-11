@@ -38,7 +38,7 @@ if (process.env.NODE_ENV !== 'test') {
 // Root route - API directory
 app.get('/', (req, res) => {
   res.json({
-    name: 'EV Charging Station Management System API',
+    name: process.env.APP_NAME ? `${process.env.APP_NAME} EV Management System API` : 'PinkCity Volt EV Management System API',
     version: '1.1.0',
     documentation: '/api/health',
     endpoints: {
